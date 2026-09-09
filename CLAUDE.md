@@ -6,7 +6,7 @@ A public portfolio project: a query engine and web app over a cat-food/treats pr
 
 ### Issue tracker
 
-Issues live as GitHub issues (repo not yet created — `git init` + push to `github.com/bamobam` is pending). See `docs/agents/issue-tracker.md`.
+Issues live as GitHub issues at `github.com/bamobam/purr-facts` (private). See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
