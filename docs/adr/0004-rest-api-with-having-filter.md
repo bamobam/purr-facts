@@ -1,0 +1,5 @@
+# Idiomatic REST endpoints, with a genuine post-aggregation filter
+
+The API is a set of resource-oriented REST endpoints (`GET /products?brand=&variant=&foodType=`, `GET /products/aggregate?groupBy=brand&metric=avg:protein_pct&having=below-average`, etc.), not a single endpoint accepting a JSON `{WHERE, OPTIONS, TRANSFORMATIONS}` query body like the original course project. This is a deliberate structural break from the original's most distinctive design choice — reinforcing [ADR 0001](./0001-clean-room-reimplementation.md) — and it's also what "RESTful API" actually means for the resume keyword this project exists to earn.
+
+We're also adding real post-aggregation filtering (`having=`), which the original engine never had: its `WHERE` clause only filters rows before `TRANSFORMATIONS` runs, so a query like "brands with below-average price-per-oz" was never actually answerable in one call there. This is a genuine capability improvement, not a gap we're routing around — a reader comparing the two shouldn't assume the omission of a JSON query-DSL means we couldn't replicate one; we chose not to, and extended past it.
