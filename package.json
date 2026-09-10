@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/rest/server.js",
     "dev": "ts-node src/rest/server.ts",
+    "etl": "ts-node src/etl/run.ts",
     "test": "mocha",
     "typecheck": "tsc --noEmit"
   },

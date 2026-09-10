@@ -1,9 +1,10 @@
 import { expect } from "chai";
 import request from "supertest";
 import { createApp } from "../../src/rest/app";
+import { fixtureProducts } from "../../src/data/fixtureProducts";
 
 describe("GET /products", () => {
-  const app = createApp();
+  const app = createApp(fixtureProducts);
 
   it("returns all fixture products when no filters are given", async () => {
     const res = await request(app).get("/products");

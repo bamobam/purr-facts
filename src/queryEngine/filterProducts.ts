@@ -1,4 +1,5 @@
 import { FoodType, LifeStage, Product } from "../models/Product";
+import { normalizeBrand } from "../shared/normalizeBrand";
 
 export interface ProductFilters {
   brand?: string;
@@ -11,10 +12,6 @@ export interface ProductFilters {
   fatPctMax?: number;
   priceMin?: number;
   priceMax?: number;
-}
-
-function normalizeBrand(brand: string): string {
-  return brand.trim().toLowerCase();
 }
 
 function matchesRange(value: number | undefined, min: number | undefined, max: number | undefined): boolean {

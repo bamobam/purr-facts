@@ -1,9 +1,10 @@
 import { expect } from "chai";
 import request from "supertest";
 import { createApp } from "../../src/rest/app";
+import { fixtureProducts } from "../../src/data/fixtureProducts";
 
 describe("GET /products/aggregate", () => {
-  const app = createApp();
+  const app = createApp(fixtureProducts);
 
   it("groups by brand and computes the average of a numeric field", async () => {
     const res = await request(app).get("/products/aggregate").query({ groupBy: "brand", metric: "avg:proteinPct" });

@@ -1,12 +1,12 @@
 import express, { Express, Request, Response } from "express";
 import path from "path";
-import { fixtureProducts } from "../data/fixtureProducts";
+import { Product } from "../models/Product";
 import { filterProducts } from "../queryEngine/filterProducts";
 import { aggregateProducts } from "../queryEngine/aggregateProducts";
 import { parseProductQuery } from "./parseProductQuery";
 import { parseAggregateQuery } from "./parseAggregateQuery";
 
-export function createApp(): Express {
+export function createApp(products: Product[]): Express {
   const app = express();
 
   app.use(express.static(path.resolve(process.cwd(), "public")));
@@ -17,7 +17,7 @@ export function createApp(): Express {
       res.status(400).json({ error: parsed.error });
       return;
     }
-    const results = filterProducts(fixtureProducts, parsed.filters);
+    const results = filterProducts(products, parsed.filters);
     res.json(results);
   });
 
@@ -27,7 +27,7 @@ export function createApp(): Express {
       res.status(400).json({ error: parsed.error });
       return;
     }
-    const results = aggregateProducts(fixtureProducts, parsed.request);
+    const results = aggregateProducts(products, parsed.request);
     res.json(results);
   });
 
