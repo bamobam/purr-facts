@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Purr Facts</title>
+<style>
+  html { color-scheme: light; }
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; background: #fff; color: #1a1a1a; }
+  h1 { margin-bottom: 0.2rem; }
+  form { display: flex; gap: 0.5rem; margin: 1.5rem 0; }
+  input { flex: 1; padding: 0.5rem; font-size: 1rem; }
+  button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #ddd; font-size: 0.9rem; }
+  #status { color: #666; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<h1>Purr Facts</h1>
+<p>Search the cat food/treats catalog by brand.</p>
+
+<form id="search-form">
+  <input id="brand-input" type="text" placeholder="e.g. Purina" autocomplete="off">
+  <button type="submit">Search</button>
+</form>
+
+<p id="status"></p>
+<table id="results-table" hidden>
+  <thead>
+    <tr><th>Brand</th><th>Product</th><th>Variant</th><th>Food Type</th></tr>
+  </thead>
+  <tbody id="results-body"></tbody>
+</table>
+
+<script>
+  var form = document.getElementById('search-form');
+  var input = document.getElementById('brand-input');
+  var status = document.getElementById('status');
+  var table = document.getElementById('results-table');
+  var body = document.getElementById('results-body');
+
+  async function search(brand) {
+    status.textContent = 'Loading…';
+    table.hidden = true;
+    var url = brand ? '/products?brand=' + encodeURIComponent(brand) : '/products';
+    var res = await fetch(url);
+    var products = await res.json();
+    body.innerHTML = '';
+    products.forEach(function (p) {
+      var row = document.createElement('tr');
+      row.innerHTML = '<td>' + p.brand + '</td><td>' + p.productName + '</td><td>' + p.variant + '</td><td>' + p.foodType + '</td>';
+      body.appendChild(row);
+    });
+    status.textContent = products.length + ' product(s) found.';
+    table.hidden = products.length === 0;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    search(input.value.trim());
+  });
+
+  search('');
+</script>
+</body>
+</html>
