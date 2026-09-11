@@ -5,62 +5,369 @@
 <title>Purr Facts</title>
 <style>
   html { color-scheme: light; }
-  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; background: #fff; color: #1a1a1a; }
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 860px; margin: 3rem auto; padding: 0 1rem; background: #fff; color: #1a1a1a; }
   h1 { margin-bottom: 0.2rem; }
-  form { display: flex; gap: 0.5rem; margin: 1.5rem 0; }
-  input { flex: 1; padding: 0.5rem; font-size: 1rem; }
-  button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
+  h2 { margin-top: 0; font-size: 1.2rem; }
+  section { margin: 2.5rem 0; padding-top: 1.5rem; border-top: 1px solid #e0e0e0; }
+  section:first-of-type { border-top: none; padding-top: 0; }
+  form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; align-items: end; margin: 1rem 0; }
+  .field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .field label { font-size: 0.8rem; color: #444; }
+  .range-field { display: flex; gap: 0.4rem; }
+  .range-field input { width: 0; flex: 1; }
+  input, select { padding: 0.4rem; font-size: 0.95rem; }
+  button { padding: 0.5rem 1rem; font-size: 0.95rem; cursor: pointer; grid-column: span 1; height: fit-content; }
   table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #ddd; font-size: 0.9rem; }
-  #status { color: #666; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #ddd; font-size: 0.85rem; }
+  .status { color: #666; font-size: 0.9rem; }
+  .error { color: #b00020; font-size: 0.9rem; }
+  #aggregate-chart { margin-top: 1rem; }
+  #aggregate-chart .bar-label { font-size: 11px; fill: #1a1a1a; }
+  #aggregate-chart .bar-value { font-size: 11px; fill: #444; }
+  #aggregate-chart rect { fill: #3a6ea5; }
 </style>
 </head>
 <body>
 <h1>Purr Facts</h1>
-<p>Search the cat food/treats catalog by brand.</p>
+<p>Search the cat food/treats catalog, or explore aggregate stats across brands and categories.</p>
 
-<form id="search-form">
-  <input id="brand-input" type="text" placeholder="e.g. Purina" autocomplete="off">
-  <button type="submit">Search</button>
-</form>
+<section>
+  <h2>Search &amp; filter</h2>
+  <form id="filter-form">
+    <div class="field">
+      <label for="filter-brand">Brand</label>
+      <select id="filter-brand"><option value="">Any</option></select>
+    </div>
+    <div class="field">
+      <label for="filter-variant">Variant</label>
+      <select id="filter-variant"><option value="">Any</option></select>
+    </div>
+    <div class="field">
+      <label for="filter-foodType">Food type</label>
+      <select id="filter-foodType">
+        <option value="">Any</option>
+        <option value="dry">Dry</option>
+        <option value="wet">Wet</option>
+        <option value="treat">Treat</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="filter-lifeStage">Life stage</label>
+      <select id="filter-lifeStage">
+        <option value="">Any</option>
+        <option value="kitten">Kitten</option>
+        <option value="adult">Adult</option>
+        <option value="senior">Senior</option>
+        <option value="all">All life stages</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Protein %</label>
+      <div class="range-field">
+        <input id="filter-proteinPctMin" type="number" step="any" placeholder="min">
+        <input id="filter-proteinPctMax" type="number" step="any" placeholder="max">
+      </div>
+    </div>
+    <div class="field">
+      <label>Fat %</label>
+      <div class="range-field">
+        <input id="filter-fatPctMin" type="number" step="any" placeholder="min">
+        <input id="filter-fatPctMax" type="number" step="any" placeholder="max">
+      </div>
+    </div>
+    <div class="field">
+      <label>Price ($)</label>
+      <div class="range-field">
+        <input id="filter-priceMin" type="number" step="any" placeholder="min">
+        <input id="filter-priceMax" type="number" step="any" placeholder="max">
+      </div>
+    </div>
+    <button type="submit">Search</button>
+  </form>
 
-<p id="status"></p>
-<table id="results-table" hidden>
-  <thead>
-    <tr><th>Brand</th><th>Product</th><th>Variant</th><th>Food Type</th></tr>
-  </thead>
-  <tbody id="results-body"></tbody>
-</table>
+  <p id="filter-status" class="status"></p>
+  <table id="results-table" hidden>
+    <thead>
+      <tr><th>Brand</th><th>Product</th><th>Variant</th><th>Food Type</th><th>Life Stage</th><th>Protein %</th><th>Fat %</th><th>Price</th></tr>
+    </thead>
+    <tbody id="results-body"></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Aggregate stats</h2>
+  <form id="aggregate-form">
+    <div class="field">
+      <label for="aggregate-groupBy">Group by</label>
+      <select id="aggregate-groupBy">
+        <option value="brand">Brand</option>
+        <option value="variant">Variant</option>
+        <option value="foodType">Food type</option>
+        <option value="lifeStage">Life stage</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="aggregate-function">Function</label>
+      <select id="aggregate-function">
+        <option value="avg">Average</option>
+        <option value="min">Minimum</option>
+        <option value="max">Maximum</option>
+        <option value="sum">Sum</option>
+        <option value="count">Count</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="aggregate-metricField">Of</label>
+      <select id="aggregate-metricField">
+        <option value="proteinPct">Protein %</option>
+        <option value="fatPct">Fat %</option>
+        <option value="fiberPct">Fiber %</option>
+        <option value="moisturePct">Moisture %</option>
+        <option value="calorieDensity">Calorie density</option>
+        <option value="price">Price ($)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="aggregate-having">Having</label>
+      <select id="aggregate-having">
+        <option value="">(none)</option>
+        <option value="above-average">Above average</option>
+        <option value="below-average">Below average</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="aggregate-sort">Sort by</label>
+      <select id="aggregate-sort">
+        <option value="">(unsorted)</option>
+        <option value="group">Group</option>
+        <option value="metric">Metric</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="aggregate-order">Order</label>
+      <select id="aggregate-order">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
+    <button type="submit">Run</button>
+  </form>
+
+  <p id="aggregate-status" class="status"></p>
+  <svg id="aggregate-chart" hidden></svg>
+  <table id="aggregate-table" hidden>
+    <thead id="aggregate-table-head"></thead>
+    <tbody id="aggregate-table-body"></tbody>
+  </table>
+</section>
 
 <script>
-  var form = document.getElementById('search-form');
-  var input = document.getElementById('brand-input');
-  var status = document.getElementById('status');
-  var table = document.getElementById('results-table');
-  var body = document.getElementById('results-body');
-
-  async function search(brand) {
-    status.textContent = 'Loading…';
-    table.hidden = true;
-    var url = brand ? '/products?brand=' + encodeURIComponent(brand) : '/products';
-    var res = await fetch(url);
-    var products = await res.json();
-    body.innerHTML = '';
-    products.forEach(function (p) {
-      var row = document.createElement('tr');
-      row.innerHTML = '<td>' + p.brand + '</td><td>' + p.productName + '</td><td>' + p.variant + '</td><td>' + p.foodType + '</td>';
-      body.appendChild(row);
-    });
-    status.textContent = products.length + ' product(s) found.';
-    table.hidden = products.length === 0;
+  function appendIfPresent(params, key, value) {
+    if (value !== undefined && value !== null && value !== '') {
+      params.set(key, value);
+    }
   }
 
-  form.addEventListener('submit', function (e) {
+  function populateSelectOptions(select, values) {
+    values.forEach(function (value) {
+      var option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
+    });
+  }
+
+  // ----- Search & filter -----
+
+  var filterForm = document.getElementById('filter-form');
+  var filterStatus = document.getElementById('filter-status');
+  var resultsTable = document.getElementById('results-table');
+  var resultsBody = document.getElementById('results-body');
+  var brandSelect = document.getElementById('filter-brand');
+  var variantSelect = document.getElementById('filter-variant');
+
+  var FILTER_FIELDS = [
+    'brand', 'variant', 'foodType', 'lifeStage',
+    'proteinPctMin', 'proteinPctMax', 'fatPctMin', 'fatPctMax', 'priceMin', 'priceMax',
+  ];
+
+  function formatCell(value) {
+    return value === undefined || value === null ? '' : value;
+  }
+
+  async function runSearch() {
+    filterStatus.textContent = 'Loading…';
+    resultsTable.hidden = true;
+
+    var params = new URLSearchParams();
+    FILTER_FIELDS.forEach(function (field) {
+      var el = document.getElementById('filter-' + field);
+      appendIfPresent(params, field, el.value.trim());
+    });
+
+    var query = params.toString();
+    var res = await fetch('/products' + (query ? '?' + query : ''));
+    var body = await res.json();
+
+    if (!res.ok) {
+      filterStatus.textContent = '';
+      filterStatus.className = 'error';
+      filterStatus.textContent = body.error || 'Something went wrong.';
+      return;
+    }
+    filterStatus.className = 'status';
+
+    resultsBody.innerHTML = '';
+    body.forEach(function (p) {
+      var row = document.createElement('tr');
+      row.innerHTML =
+        '<td>' + formatCell(p.brand) + '</td>' +
+        '<td>' + formatCell(p.productName) + '</td>' +
+        '<td>' + formatCell(p.variant) + '</td>' +
+        '<td>' + formatCell(p.foodType) + '</td>' +
+        '<td>' + formatCell(p.lifeStage) + '</td>' +
+        '<td>' + formatCell(p.proteinPct) + '</td>' +
+        '<td>' + formatCell(p.fatPct) + '</td>' +
+        '<td>' + formatCell(p.price) + '</td>';
+      resultsBody.appendChild(row);
+    });
+    filterStatus.textContent = body.length + ' product(s) found.';
+    resultsTable.hidden = body.length === 0;
+  }
+
+  filterForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    search(input.value.trim());
+    runSearch();
   });
 
-  search('');
+  // ----- Aggregate stats -----
+
+  var aggregateForm = document.getElementById('aggregate-form');
+  var aggregateStatus = document.getElementById('aggregate-status');
+  var aggregateChart = document.getElementById('aggregate-chart');
+  var aggregateTable = document.getElementById('aggregate-table');
+  var aggregateTableHead = document.getElementById('aggregate-table-head');
+  var aggregateTableBody = document.getElementById('aggregate-table-body');
+  var functionSelect = document.getElementById('aggregate-function');
+  var metricFieldSelect = document.getElementById('aggregate-metricField');
+  var sortSelect = document.getElementById('aggregate-sort');
+  var orderSelect = document.getElementById('aggregate-order');
+
+  function updateMetricFieldAvailability() {
+    metricFieldSelect.disabled = functionSelect.value === 'count';
+  }
+  functionSelect.addEventListener('change', updateMetricFieldAvailability);
+  updateMetricFieldAvailability();
+
+  function renderChart(rows, groupBy) {
+    var width = 760;
+    var barHeight = 24;
+    var gap = 8;
+    var labelWidth = 160;
+    var maxBarWidth = width - labelWidth - 60;
+    var height = rows.length * (barHeight + gap) + gap;
+
+    var maxValue = Math.max.apply(null, rows.map(function (r) { return Number(r.metric); }).concat([0]));
+
+    aggregateChart.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    aggregateChart.setAttribute('width', width);
+    aggregateChart.setAttribute('height', height);
+    aggregateChart.innerHTML = '';
+
+    rows.forEach(function (row, i) {
+      var y = gap + i * (barHeight + gap);
+      var value = Number(row.metric);
+      var barWidth = maxValue > 0 ? (value / maxValue) * maxBarWidth : 0;
+
+      var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', labelWidth - 8);
+      label.setAttribute('y', y + barHeight / 2 + 4);
+      label.setAttribute('text-anchor', 'end');
+      label.setAttribute('class', 'bar-label');
+      label.textContent = String(row[groupBy]);
+      aggregateChart.appendChild(label);
+
+      var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', labelWidth);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', Math.max(barWidth, 1));
+      rect.setAttribute('height', barHeight);
+      aggregateChart.appendChild(rect);
+
+      var valueLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      valueLabel.setAttribute('x', labelWidth + barWidth + 6);
+      valueLabel.setAttribute('y', y + barHeight / 2 + 4);
+      valueLabel.setAttribute('class', 'bar-value');
+      valueLabel.textContent = Number.isInteger(value) ? String(value) : value.toFixed(2);
+      aggregateChart.appendChild(valueLabel);
+    });
+
+    aggregateChart.hidden = rows.length === 0;
+  }
+
+  function renderAggregateTable(rows, groupBy, metricLabel) {
+    aggregateTableHead.innerHTML = '<tr><th>' + groupBy + '</th><th>' + metricLabel + '</th><th>count</th></tr>';
+    aggregateTableBody.innerHTML = '';
+    rows.forEach(function (row) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + formatCell(row[groupBy]) + '</td><td>' + formatCell(row.metric) + '</td><td>' + formatCell(row.count) + '</td>';
+      aggregateTableBody.appendChild(tr);
+    });
+    aggregateTable.hidden = rows.length === 0;
+  }
+
+  async function runAggregate() {
+    aggregateStatus.className = 'status';
+    aggregateStatus.textContent = 'Loading…';
+    aggregateChart.hidden = true;
+    aggregateTable.hidden = true;
+
+    var groupBy = document.getElementById('aggregate-groupBy').value;
+    var fn = functionSelect.value;
+    var metric = fn === 'count' ? 'count' : fn + ':' + metricFieldSelect.value;
+
+    var params = new URLSearchParams();
+    params.set('groupBy', groupBy);
+    params.set('metric', metric);
+    appendIfPresent(params, 'having', document.getElementById('aggregate-having').value);
+    var sort = sortSelect.value;
+    appendIfPresent(params, 'sort', sort);
+    if (sort) {
+      appendIfPresent(params, 'order', orderSelect.value);
+    }
+
+    var res = await fetch('/products/aggregate?' + params.toString());
+    var body = await res.json();
+
+    if (!res.ok) {
+      aggregateStatus.className = 'error';
+      aggregateStatus.textContent = body.error || 'Something went wrong.';
+      return;
+    }
+
+    aggregateStatus.textContent = body.length + ' group(s).';
+    renderChart(body, groupBy);
+    renderAggregateTable(body, groupBy, metric);
+  }
+
+  aggregateForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    runAggregate();
+  });
+
+  // ----- Startup: populate filter option lists from the real dataset, then run both views -----
+
+  async function init() {
+    var res = await fetch('/products');
+    var products = await res.json();
+    populateSelectOptions(brandSelect, [...new Set(products.map(function (p) { return p.brand; }))].sort());
+    populateSelectOptions(variantSelect, [...new Set(products.map(function (p) { return p.variant; }))].sort());
+
+    runSearch();
+    runAggregate();
+  }
+
+  init();
 </script>
 </body>
 </html>
