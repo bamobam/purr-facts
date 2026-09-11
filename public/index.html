@@ -206,7 +206,11 @@
   // are still reachable in each categorical dropdown given the others' current selections.
   var allProducts = [];
 
+  // Brand is the anchor filter: its own option list always covers the whole catalog and is never
+  // narrowed by the other selections, so it can't be reset out from under the user mid-search.
+  // Variant/foodType/lifeStage narrow each other *and* respect the selected brand, but not vice versa.
   var CATEGORICAL_FIELDS = ['brand', 'variant', 'foodType', 'lifeStage'];
+  var NARROWABLE_FIELDS = ['variant', 'foodType', 'lifeStage'];
   var CATEGORICAL_FIELD_ORDER = {
     foodType: ['dry', 'wet', 'treat'],
     lifeStage: ['kitten', 'adult', 'senior', 'all'],
@@ -224,13 +228,18 @@
     return order.filter(function (value) { return values.indexOf(value) !== -1; });
   }
 
-  // Narrows each categorical dropdown to the values still reachable given the other three's
-  // current selections (a standard faceted-search pass), resetting any selection it invalidates.
-  // Run twice: a reset in the first pass can itself invalidate another field, and two passes over
-  // four fields is cheap enough not to bother with a real fixed-point loop.
+  function populateBrandOptions() {
+    var values = [...new Set(allProducts.map(function (p) { return p.brand; }))].sort();
+    populateSelectOptions(document.getElementById('filter-brand'), values);
+  }
+
+  // Narrows variant/foodType/lifeStage to the values still reachable given brand plus each
+  // other's current selections, resetting any selection it invalidates. Run twice: a reset in the
+  // first pass can itself invalidate another field, and two passes over three fields is cheap
+  // enough not to bother with a real fixed-point loop.
   function refreshFilterOptions() {
     for (var pass = 0; pass < 2; pass++) {
-      CATEGORICAL_FIELDS.forEach(function (field) {
+      NARROWABLE_FIELDS.forEach(function (field) {
         var select = document.getElementById('filter-' + field);
         var currentValue = select.value;
         var otherFields = CATEGORICAL_FIELDS.filter(function (other) { return other !== field; });
@@ -414,6 +423,7 @@
     var products = await runSearch();
     if (products !== undefined) {
       allProducts = products;
+      populateBrandOptions();
       refreshFilterOptions();
     }
     runAggregate();
