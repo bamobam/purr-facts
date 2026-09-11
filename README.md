@@ -2,13 +2,13 @@
 
 A clean-room query engine and REST API over a cat food/treats product catalog, with a simple web frontend for filtering and aggregate stats. See [`CONTEXT.md`](./CONTEXT.md) for domain vocabulary and [`docs/adr/`](./docs/adr/) for architectural decisions.
 
-**Live**: https://purr-facts.onrender.com _(see caveat under Definition of Done below — the live deploy currently lags `main`)_
+**Live**: https://purr-facts.onrender.com
 
 ## Definition of done (v1)
 
 Per [issue #1](https://github.com/bamobam/purr-facts/issues/1):
 
-- [ ] **Deployed and reachable** — the Render service responds, but as of 2026-09-11 it's serving stale, pre-ETL walking-skeleton data (2 hardcoded Purina rows), not the real dataset described below. Auto-deploy from `main` appears to have stalled around commit `4751e91`; everything from the ETL pipeline (`06c8d1a`) onward, including the full frontend (#7), has not reached production. Needs investigation on the Render dashboard.
+- [x] **Deployed and reachable** — serving the real 58-product dataset and the full filter/aggregate frontend as of 2026-09-11. (Every deploy since the ETL commit had been crash-looping on boot — the Docker runtime stage never copied `data/` into the image, so `loadDataset()` hit `ENOENT` and Render kept silently falling back to the last container that booted, a pre-ETL walking-skeleton build. Fixed in `e738801`.)
 - [x] **≥30 products across ≥5 brands** — `data/products.json` has 58 products across 19 distinct brands (30 hand-curated, 28 from Open Pet Food Facts).
 - [x] **Filtering** — `GET /products` filters by brand (case/whitespace-insensitive), variant, foodType, lifeStage, and numeric ranges (protein/fat/price), combinable with AND semantics. Exposed in the frontend as well as the API.
 - [x] **≥3 documented example aggregate queries** — see below.
