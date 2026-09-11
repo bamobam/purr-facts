@@ -177,6 +177,19 @@
     });
   }
 
+  // Fetches url, reporting errors on statusEl; returns the parsed body, or undefined on a non-2xx response.
+  async function fetchJSON(url, statusEl) {
+    var res = await fetch(url);
+    var body = await res.json();
+    if (!res.ok) {
+      statusEl.className = 'error';
+      statusEl.textContent = body.error || 'Something went wrong.';
+      return undefined;
+    }
+    statusEl.className = 'status';
+    return body;
+  }
+
   // ----- Search & filter -----
 
   var filterForm = document.getElementById('filter-form');
@@ -206,16 +219,10 @@
     });
 
     var query = params.toString();
-    var res = await fetch('/products' + (query ? '?' + query : ''));
-    var body = await res.json();
-
-    if (!res.ok) {
-      filterStatus.textContent = '';
-      filterStatus.className = 'error';
-      filterStatus.textContent = body.error || 'Something went wrong.';
+    var body = await fetchJSON('/products' + (query ? '?' + query : ''), filterStatus);
+    if (body === undefined) {
       return;
     }
-    filterStatus.className = 'status';
 
     resultsBody.innerHTML = '';
     body.forEach(function (p) {
@@ -336,12 +343,8 @@
       appendIfPresent(params, 'order', orderSelect.value);
     }
 
-    var res = await fetch('/products/aggregate?' + params.toString());
-    var body = await res.json();
-
-    if (!res.ok) {
-      aggregateStatus.className = 'error';
-      aggregateStatus.textContent = body.error || 'Something went wrong.';
+    var body = await fetchJSON('/products/aggregate?' + params.toString(), aggregateStatus);
+    if (body === undefined) {
       return;
     }
 
