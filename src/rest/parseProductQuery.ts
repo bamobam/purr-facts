@@ -1,13 +1,14 @@
-import { FoodType, LifeStage } from "../models/Product";
+import { AdequacyStage, AdequacyStandard, FoodType } from "../models/Product";
 import { ProductFilters } from "../queryEngine/filterProducts";
 import { parseEnumParam, parseNumericParam, parseStringParam } from "./queryParamParsing";
 
-const FOOD_TYPES: FoodType[] = ["dry", "wet", "treat"];
-const LIFE_STAGES: LifeStage[] = ["kitten", "adult", "senior", "all"];
+const FOOD_TYPES: FoodType[] = ["dry", "wet"];
+const ADEQUACY_STANDARDS: AdequacyStandard[] = ["aafco", "fediaf", "none"];
+const ADEQUACY_STAGES: AdequacyStage[] = ["adult-maintenance", "all-life-stages", "not-stated"];
 
-const NUMERIC_PARAMS = ["proteinPctMin", "proteinPctMax", "fatPctMin", "fatPctMax", "priceMin", "priceMax"] as const;
+const NUMERIC_PARAMS = ["proteinPctMin", "proteinPctMax", "fatPctMin", "fatPctMax"] as const;
 
-const KNOWN_PARAMS: readonly string[] = ["brand", "variant", "foodType", "lifeStage", ...NUMERIC_PARAMS];
+const KNOWN_PARAMS: readonly string[] = ["brand", "variant", "foodType", "adequacyStandard", "adequacyStage", ...NUMERIC_PARAMS];
 
 export type ParseProductQueryResult = { ok: true; filters: ProductFilters } | { ok: false; error: string };
 
@@ -44,12 +45,20 @@ export function parseProductQuery(query: Record<string, unknown>): ParseProductQ
     filters.foodType = foodType.value;
   }
 
-  const lifeStage = parseEnumParam("lifeStage", query.lifeStage, LIFE_STAGES);
-  if (!lifeStage.ok) {
-    return lifeStage;
+  const adequacyStandard = parseEnumParam("adequacyStandard", query.adequacyStandard, ADEQUACY_STANDARDS);
+  if (!adequacyStandard.ok) {
+    return adequacyStandard;
   }
-  if (lifeStage.value !== undefined) {
-    filters.lifeStage = lifeStage.value;
+  if (adequacyStandard.value !== undefined) {
+    filters.adequacyStandard = adequacyStandard.value;
+  }
+
+  const adequacyStage = parseEnumParam("adequacyStage", query.adequacyStage, ADEQUACY_STAGES);
+  if (!adequacyStage.ok) {
+    return adequacyStage;
+  }
+  if (adequacyStage.value !== undefined) {
+    filters.adequacyStage = adequacyStage.value;
   }
 
   for (const paramName of NUMERIC_PARAMS) {

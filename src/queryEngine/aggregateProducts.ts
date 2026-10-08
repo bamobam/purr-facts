@@ -1,7 +1,7 @@
 import { Product } from "../models/Product";
 
-export type GroupableField = "brand" | "variant" | "foodType" | "lifeStage";
-export type NumericField = "proteinPct" | "fatPct" | "fiberPct" | "moisturePct" | "calorieDensity" | "price";
+export type GroupableField = "brand" | "parentCompany" | "variant" | "foodType" | "adequacyStandard" | "adequacyStage";
+export type NumericField = "proteinPct" | "fatPct" | "fiberPct" | "moisturePct" | "kcalPerKg";
 export type AggregateFunction = "avg" | "min" | "max" | "sum" | "count";
 export type HavingFilter = "above-average" | "below-average";
 export type SortTarget = "group" | "metric";

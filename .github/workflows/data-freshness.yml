@@ -1,0 +1,20 @@
+name: Data freshness
+
+# Prices and recall searches age. This fails when any warning is raised (a price older than 90 days,
+# a recall source check older than 90 days, a kcal mismatch), so stale data turns up as a red run.
+on:
+  schedule:
+    - cron: "0 14 1 * *"
+  workflow_dispatch:
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run validate:data:strict

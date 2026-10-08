@@ -2,15 +2,19 @@
   "name": "purr-facts",
   "version": "0.1.0",
   "private": true,
-  "description": "Cat food/treats query engine and REST API — portfolio project",
+  "description": "Cat food/treats query engine and REST API \u2014 portfolio project",
   "main": "dist/rest/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run web:build",
     "start": "node dist/rest/server.js",
     "dev": "ts-node src/rest/server.ts",
-    "etl": "ts-node src/etl/run.ts",
+    "build:data": "ts-node src/etl/run.ts",
+    "validate:data": "ts-node src/etl/run.ts --check",
     "test": "mocha",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web",
+    "web:dev": "vite --config web/vite.config.ts",
+    "web:build": "vite build --config web/vite.config.ts",
+    "validate:data:strict": "ts-node src/etl/run.ts --check --strict"
   },
   "dependencies": {
     "express": "^5.1.0"
@@ -20,12 +24,19 @@
     "@types/express": "^5.0.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@types/supertest": "^6.0.3",
+    "@vitejs/plugin-react": "^5.2.0",
     "chai": "^4.5.0",
     "csv-parse": "^7.0.2",
     "mocha": "^11.7.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vite": "^7.3.7"
   }
 }

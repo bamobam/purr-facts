@@ -17,5 +17,26 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run validate:data
       - run: npm test
       - run: npm run build
+
+  docker-smoke:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t purr-facts .
+      - name: Boot it and check the data and the frontend are really served
+        run: |
+          docker run -d --name purr-facts -p 3000:3000 purr-facts
+          for i in $(seq 1 30); do curl -fs localhost:3000/health && break; sleep 1; done
+          curl -fs localhost:3000/health
+          curl -fs localhost:3000/ | grep -q "Purr Facts"
+          curl -fs localhost:3000/meta | grep -q incidentScope
+          curl -fs "localhost:3000/products/curated-26/alternatives?goal=protein" | grep -q alternatives
+      - name: Show logs on failure
+        if: failure()
+        run: docker logs purr-facts
+

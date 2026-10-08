@@ -6,3 +6,5 @@ test
 docs
 *.md
 .DS_Store
+data/*.numbers
+data/archive

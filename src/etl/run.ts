@@ -1,95 +1,60 @@
 import fs from "fs";
 import path from "path";
-import zlib from "zlib";
-import { parse } from "csv-parse/sync";
-import { mapOpenPetFoodFactsRow, OpffRawRow } from "./mapOpenPetFoodFactsRow";
+import { buildDataset } from "../data/buildDataset";
 import { loadCuratedProducts } from "./loadCuratedProducts";
-import { joinRecallsByBrand, OpenFdaRecallRecord } from "./joinRecallsByBrand";
-import { normalizeBrand } from "../shared/normalizeBrand";
-import { Product } from "../models/Product";
+import { loadIncidentChecks, loadIncidents } from "./loadIncidents";
+import { loadPrices } from "./loadPrices";
+import { validateIncidents } from "./validateIncidents";
+import { validatePrices } from "./validatePrices";
+import { validateProducts } from "./validateProducts";
+import { ValidationIssue } from "./validationTypes";
 
-const OPFF_URL = "https://static.openpetfoodfacts.org/data/en.openpetfoodfacts.org.products.csv.gz";
-const OPENFDA_URL = "https://api.fda.gov/food/enforcement.json";
-const OPENFDA_QUERIES = ['product_description:"cat food"', 'product_description:"dog food"', 'product_description:"pet food"'];
-
-async function fetchOpffProducts(): Promise<Product[]> {
-  console.log("Downloading Open Pet Food Facts bulk export...");
-  const res = await fetch(OPFF_URL);
-  if (!res.ok) {
-    throw new Error(`Failed to download Open Pet Food Facts data: HTTP ${res.status}`);
+/**
+ * `npm run build:data`  validates data/*.csv and writes data/products.json.
+ * `npm run validate:data` (--check) validates only, writing nothing.
+ * `--strict` also fails on warnings (stale prices, stale source checks, kcal mismatches); the
+ * scheduled data-freshness workflow uses it so data that has aged out turns a check red.
+ */
+function report(label: string, issues: ValidationIssue[]): void {
+  for (const issue of issues) {
+    const where = issue.field ? `${issue.productId}.${issue.field}` : issue.productId;
+    console.log(`${issue.severity.toUpperCase().padEnd(7)} ${label} ${where}: ${issue.message}`);
   }
-  const gzipped = Buffer.from(await res.arrayBuffer());
-  const decompressed = zlib.gunzipSync(gzipped).toString("utf-8");
-
-  console.log("Parsing Open Pet Food Facts TSV...");
-  const rows = parse(decompressed, {
-    columns: true,
-    delimiter: "\t",
-    quote: false, // this is a raw TSV export, not RFC4180 CSV — literal quote characters in fields (e.g. French product names) aren't escape syntax
-    skip_empty_lines: true,
-    relax_column_count: true,
-  }) as unknown as OpffRawRow[];
-  console.log(`Parsed ${rows.length} raw Open Pet Food Facts rows`);
-
-  const products = rows.map(mapOpenPetFoodFactsRow).filter((p): p is Product => p !== undefined);
-  console.log(`Mapped ${products.length} US cat products with a determinable food type`);
-  return products;
 }
 
-async function fetchOpenFdaRecalls(): Promise<OpenFdaRecallRecord[]> {
-  const all: OpenFdaRecallRecord[] = [];
-  for (const query of OPENFDA_QUERIES) {
-    console.log(`Querying openFDA Food Enforcement: ${query}`);
-    const url = `${OPENFDA_URL}?search=${encodeURIComponent(query)}&limit=100`;
-    const res = await fetch(url);
-    if (res.status === 404) {
-      console.log(`No openFDA matches for: ${query}`);
-      continue;
-    }
-    if (!res.ok) {
-      console.warn(`openFDA query failed (HTTP ${res.status}), skipping: ${query}`);
-      continue;
-    }
-    const data = (await res.json()) as { results?: Record<string, string>[] };
-    for (const r of data.results ?? []) {
-      all.push({
-        recalling_firm: r.recalling_firm ?? "",
-        product_description: r.product_description ?? "",
-        reason_for_recall: r.reason_for_recall ?? "",
-        recall_number: r.recall_number ?? "",
-        classification: r.classification ?? "",
-        recall_initiation_date: r.recall_initiation_date ?? "",
-      });
-    }
-  }
-  const byRecallNumber = new Map(all.map((r) => [r.recall_number, r]));
-  const deduped = Array.from(byRecallNumber.values());
-  console.log(`Fetched ${deduped.length} distinct openFDA recall records`);
-  return deduped;
-}
-
-async function main(): Promise<void> {
+function main(): void {
+  const checkOnly = process.argv.includes("--check");
+  const strict = process.argv.includes("--strict");
   const dataDir = path.resolve(__dirname, "../../data");
 
-  const curatedProducts = loadCuratedProducts(fs.readFileSync(path.join(dataDir, "curated-products.csv"), "utf-8"));
-  console.log(`Loaded ${curatedProducts.length} curated products`);
+  const products = loadCuratedProducts(fs.readFileSync(path.join(dataDir, "curated-products.csv"), "utf-8"));
+  const prices = loadPrices(fs.readFileSync(path.join(dataDir, "prices.csv"), "utf-8"));
+  const incidents = loadIncidents(fs.readFileSync(path.join(dataDir, "incidents.csv"), "utf-8"));
+  const incidentChecks = loadIncidentChecks(fs.readFileSync(path.join(dataDir, "incident-checks.csv"), "utf-8"));
+  console.log(`Loaded ${products.length} products, ${prices.length} price observations and ${incidents.length} incidents`);
 
-  const opffProducts = await fetchOpffProducts();
+  const productIssues = validateProducts(products);
+  const priceIssues = validatePrices(prices, products);
+  const incidentIssues = validateIncidents(incidents, incidentChecks, products);
+  report("products ", productIssues);
+  report("prices   ", priceIssues);
+  report("incidents", incidentIssues);
 
-  const allProducts: Product[] = [...curatedProducts, ...opffProducts];
-  console.log(`Merged dataset: ${allProducts.length} products total`);
+  const allIssues = [...productIssues, ...priceIssues, ...incidentIssues];
+  const errors = allIssues.filter((i) => i.severity === "error").length;
+  const warnings = allIssues.filter((i) => i.severity === "warning").length;
+  console.log(`${errors} error(s), ${warnings} warning(s)`);
+  if (errors > 0 || (strict && warnings > 0)) {
+    process.exit(1);
+  }
 
-  const recalls = await fetchOpenFdaRecalls();
-  const brands = Array.from(new Set(allProducts.map((p) => normalizeBrand(p.brand))));
-  const recallsByBrand = joinRecallsByBrand(brands, recalls);
-  console.log(`Joined recalls to ${Object.keys(recallsByBrand).length} of ${brands.length} distinct brands`);
-
-  fs.writeFileSync(path.join(dataDir, "products.json"), JSON.stringify(allProducts, null, 2));
-  fs.writeFileSync(path.join(dataDir, "recalls.json"), JSON.stringify(recallsByBrand, null, 2));
-  console.log("Wrote data/products.json and data/recalls.json");
+  if (!checkOnly) {
+    const { products: built, meta } = buildDataset(products, prices, { incidents, incidentChecks });
+    fs.writeFileSync(path.join(dataDir, "products.json"), JSON.stringify(built, null, 2));
+    fs.writeFileSync(path.join(dataDir, "meta.json"), JSON.stringify(meta, null, 2));
+    fs.writeFileSync(path.join(dataDir, "incidents.json"), JSON.stringify(incidents, null, 2));
+    console.log(`Wrote data/products.json (${built.length} products) and data/meta.json and data/incidents.json (price coverage ${Math.round(meta.priceCoverage * 100)}%)`);
+  }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main();

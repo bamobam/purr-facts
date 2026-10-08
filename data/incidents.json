@@ -1,0 +1,55 @@
+[
+  {
+    "id": "fda-2021-04-09-meow-mix-original-choice",
+    "brand": "Meow Mix",
+    "productIds": [
+      "curated-7"
+    ],
+    "date": "2021-04-09",
+    "type": "recall",
+    "evidenceTier": "regulator",
+    "reason": "Potential Salmonella contamination",
+    "jurisdiction": "US",
+    "affects": "Meow Mix Original Choice Dry Cat Food, 30 lb bag only, two lots (1081804 and 1082804, best by 9/14/2022 and 9/15/2022), sold at select Walmart stores in eight US states (IL, MO, NE, NM, OK, UT, WI, WY). The company says no other Meow Mix products are affected; the notice does not mention Canada. No illnesses reported. The best-by dates are long past.",
+    "sourceUrl": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/j-m-smucker-co-issues-limited-voluntary-recall-two-lots-meow-mixr-original-choice-dry-cat-food"
+  },
+  {
+    "id": "fda-2025-12-26-gold-star-fancy-feast",
+    "brand": "Fancy Feast",
+    "productIds": [],
+    "date": "2025-12-26",
+    "type": "recall",
+    "evidenceTier": "regulator",
+    "reason": "Rodent and bird contamination at a distributor's storage facility; risk of Salmonella and other microorganisms",
+    "jurisdiction": "US",
+    "affects": "Gold Star Distribution of Minneapolis recalled every FDA-regulated product held at its facility. Fancy Feast items named in the FDA's product list: Creamy Delight Salmon, Medleys Florentine and Gravy Lovers 3 oz cans (24-count cases). The catalog's Fancy Feast foods are not named. Delivered to 54 locations in Minnesota, Indiana and North Dakota; Canada is not mentioned. No illnesses reported.",
+    "sourceUrl": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/gold-star-distribution-inc-issues-recall-certain-fda-regulated-products-three-states-including-drugs"
+  },
+  {
+    "id": "fda-2025-12-26-gold-star-meow-mix",
+    "brand": "Meow Mix",
+    "productIds": [
+      "curated-7"
+    ],
+    "date": "2025-12-26",
+    "type": "recall",
+    "evidenceTier": "regulator",
+    "reason": "Rodent and bird contamination at a distributor's storage facility; risk of Salmonella and other microorganisms",
+    "jurisdiction": "US",
+    "affects": "Gold Star Distribution of Minneapolis recalled every FDA-regulated product held at its facility. The FDA's product list names Meow Mix dry foods: Original (18 oz x 6 and 3.15 lb x 4 cases) and four 3 lb x 4 flavours (Beef & Salmon, Chicken & Tuna, Salmon & Chicken, Salmon & Turkey). It lists the first as Meow Mix Original, linked here to Original Choice by name; the notice gives no more detail. Delivered to 54 locations in Minnesota, Indiana and North Dakota; Canada is not mentioned. No illnesses reported.",
+    "sourceUrl": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/gold-star-distribution-inc-issues-recall-certain-fda-regulated-products-three-states-including-drugs"
+  },
+  {
+    "id": "trade-2023-01-23-royal-canin-feline-renal-support",
+    "brand": "Royal Canin",
+    "productIds": [],
+    "date": "2023-01-23",
+    "type": "recall",
+    "evidenceTier": "company-or-trade",
+    "reason": "Mislabeled: some bags may contain a different product",
+    "jurisdiction": "US",
+    "affects": "Royal Canin Veterinary Diet Feline Renal Support F dry cat food, 6.6 lb (3 kg) bags, one lot (242B4RCR04, best by April 17, 2024; 3,164 bags). A prescription cat food, so not in the catalog. Distributed in the US; Canada is not mentioned. The class is from the FDA Enforcement Report as reported by Truth About Pet Food; the AVMA notice dates it January 23, 2023.",
+    "sourceUrl": "https://truthaboutpetfood.com/royal-canin-veterinary-feline-renal-support-f-class-ii-recall/",
+    "recallClass": "Class II"
+  }
+]
