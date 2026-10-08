@@ -28,9 +28,11 @@ export function createApp(products: Product[], options: AppOptions = {}): Expres
   const app = express();
   const incidents = options.incidents ?? [];
 
-  // The built Vite frontend (npm run web:build). Falls back to the old static page if it has not been built.
+  // The built Vite frontend (npm run web:build). Without it the API still runs, so tests and `npm run dev` work unbuilt.
   const builtFrontend = path.resolve(process.cwd(), "web", "dist");
-  app.use(express.static(fs.existsSync(builtFrontend) ? builtFrontend : path.resolve(process.cwd(), "public")));
+  if (fs.existsSync(builtFrontend)) {
+    app.use(express.static(builtFrontend));
+  }
 
   app.get("/products", (req: Request, res: Response) => {
     const parsed = parseProductQuery(req.query as Record<string, unknown>);

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { bestIndexes, cohortLabel, describeBenchmark, displayName, formatMoney, formatNumber, formatNutrient, sortProducts, stageLabel } from "../../web/src/lib/format";
+import { bestIndexes, cohortLabel, describeBenchmark, displayName, flagText, ALL_STAGES_NOTE, formatMoney, formatNumber, formatNutrient, sortProducts, stageLabel } from "../../web/src/lib/format";
 import { makeProduct } from "../fixtures/products";
 
 describe("formatNutrient", () => {
@@ -111,5 +111,32 @@ describe("displayName", () => {
   });
   it("collapses a partial overlap between the end of the brand and the start of the name", () => {
     expect(displayName({ brand: "Hill's Science Diet", productName: "Science Diet Adult Multiple Benefit" })).to.equal("Hill's Science Diet Adult Multiple Benefit");
+  });
+});
+
+describe("flagText", () => {
+  const d = (over: Record<string, number>) => ({ priceObservationCount: 0, completeness: 1, ...over });
+  it("says none found when nothing names the food or its brand", () => {
+    expect(flagText(d({}))).to.equal("None found");
+    expect(flagText(undefined)).to.equal("None found");
+  });
+  it("counts recalls that name the food, with the right plural", () => {
+    expect(flagText(d({ incidentCount: 1 }))).to.equal("Named in 1 recall");
+    expect(flagText(d({ incidentCount: 2 }))).to.equal("Named in 2 recalls");
+  });
+  it("never reads a regulator investigation as a recall", () => {
+    expect(flagText(d({ reportCount: 1 }))).to.equal("Named in 1 investigation, not a recall");
+    expect(flagText(d({ reportCount: 2 }))).to.equal("Named in 2 investigations, not recalls");
+    expect(flagText(d({ brandReportCount: 1 }))).to.equal("Brand named in 1 investigation, not a recall");
+  });
+  it("shows brand-level notices only when none names the food", () => {
+    expect(flagText(d({ brandIncidentCount: 2 }))).to.equal("Brand has 2 other notices");
+    expect(flagText(d({ incidentCount: 1, brandIncidentCount: 3 }))).to.equal("Named in 1 recall");
+  });
+});
+
+describe("ALL_STAGES_NOTE", () => {
+  it("tells people why all-life-stages foods are kept apart", () => {
+    expect(ALL_STAGES_NOTE).to.match(/all life stages/i).and.match(/calorie-dense/i);
   });
 });

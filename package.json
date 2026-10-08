@@ -2,7 +2,7 @@
   "name": "purr-facts",
   "version": "0.1.0",
   "private": true,
-  "description": "Cat food/treats query engine and REST API \u2014 portfolio project",
+  "description": "Cat food/treats query engine and REST API — portfolio project",
   "main": "dist/rest/server.js",
   "scripts": {
     "build": "tsc && npm run web:build",

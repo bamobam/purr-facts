@@ -282,7 +282,7 @@ Manual by design. A scheduled/manual script `npm run incidents:candidates` pulls
 - **Copy rules:** every nutrient shows its basis ("≥ 9%"); "None found" is always paired with the check date and "not a safety rating"; "highest"/"lowest" mark extremes, not recommendations; foods with no stated life stage say why they have no peers.
 - **Build:** `npm run web:build` writes `web/dist`; `npm run build` runs `tsc` then the web build; the Dockerfile builds and copies `web/dist`. The old `public/index.html` was removed.
 - **Tooling:** `npm run typecheck` checks both `src` and `web`. `npm run web:dev` starts Vite on 5173 with a proxy to the API on 3000.
-- **Not done:** component tests, a CI smoke test of the Docker image, the aggregate fixes, deployment.
+- **Not done:** component tests, the aggregate fixes. (The CI smoke test of the Docker image and deployment were added in section 12.)
 
 ## 12. Release and operations (2026-10-07)
 

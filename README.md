@@ -2,7 +2,7 @@
 
 A free, browsable database of Canadian cat foods. It compares foods on what the label says **per calorie**, shows cited recall and safety flags for each food, and finds alternatives to the food your cat already eats.
 
-**Live:** https://purr-facts.onrender.com (updates when `main` is deployed)
+**Live:** https://purr-facts.onrender.com
 
 ## What it is, and what it is not
 
