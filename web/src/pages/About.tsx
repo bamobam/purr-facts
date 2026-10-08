@@ -22,6 +22,14 @@ export function About() {
         </ul>
       </section>
 
+      <section aria-labelledby="mistake-heading">
+        <h2 id="mistake-heading">Found a mistake?</h2>
+        <p>Tell us which food and what its label or source says, and we will check it.</p>
+        <p>
+          <ReportLink />
+        </p>
+      </section>
+
       <section aria-labelledby="figures-heading">
         <h2 id="figures-heading">Where the figures come from</h2>
         <p>
@@ -86,14 +94,6 @@ export function About() {
             </ul>
           </>
         )}
-      </section>
-
-      <section aria-labelledby="mistake-heading">
-        <h2 id="mistake-heading">Found a mistake?</h2>
-        <p>Tell us which food and what its label or source says, and we will check it.</p>
-        <p>
-          <ReportLink />
-        </p>
       </section>
 
       <section aria-labelledby="fresh-heading">
