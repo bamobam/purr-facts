@@ -4,6 +4,7 @@ import { MAX_COMPARE, useAppData } from "../AppData";
 import { BenchmarkMetric, ProductDetail, useApi } from "../api";
 import { Alternatives } from "../components/Alternatives";
 import { LabelBadges } from "../components/Badges";
+import { ReportLink } from "../components/ReportLink";
 import { IncidentsSection } from "../components/Incidents";
 import { cohortLabel, describeBenchmark, displayName, formatMoney, formatNumber, formatNutrient } from "../lib/format";
 
@@ -50,7 +51,8 @@ export function ProductPage() {
         <button type="button" onClick={() => toggleSelected(p.id)} disabled={!inCompare && selected.length >= MAX_COMPARE}>
           {inCompare ? "Remove from compare" : "Add to compare"}
         </button>{" "}
-        {selected.length > 0 && <Link to={`/compare?ids=${selected.join(",")}`}>Compare {selected.length} selected</Link>}
+        {selected.length > 0 && <Link to={`/compare?ids=${selected.join(",")}`}>Compare {selected.length} selected</Link>}{" "}
+        <ReportLink food={`${displayName(p)} (${p.id})`} label="Report an error with this food" />
       </p>
 
       <section aria-labelledby="label-heading">

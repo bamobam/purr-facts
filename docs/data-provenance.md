@@ -25,7 +25,7 @@
 - **Size policy:** wet food is the case size; dry food is the larger bag listed. Fromm Four-Star wet pâtés (31, 45) were priced on PetMax's 12-can case, which was listed out of stock.
 - **Caveats:** Royal Canin Indoor dry (22), Royal Canin Aging dry (24) and Meow Mix Original (7) were read from Amazon search results with the size in the title, not from the product page. IAMS Senior (28) uses the $19.77 for 3.18 kg you gave (Amazon showed $16.80 on 2026-10-06; the 1.59 kg bag is $13.97).
 - **Row 4 (Fancy Feast Petites Ocean Whitefish with tomato)** is the Real Canadian Superstore listing you screenshotted: $1.29 for one 79.4 g tray, plus tax. That is a single tray, not a case. The page's "Offer expires" line is a PC Optimum points offer, not the price.
-- **Still needed:** nothing; `data/prices-still-needed.csv` is empty.
+- **Still needed:** nothing.
 
 ### Recalls and safety alerts
 

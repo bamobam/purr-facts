@@ -7,7 +7,7 @@ A free, browsable database of Canadian cat foods. It compares foods on what the 
 ## What it is, and what it is not
 
 - **A data tool, not advice.** It reports numbers, their basis, their source and their date. It has no quality score, no "best cat food" list and no claims such as "good for senior cats". Higher protein per calorie is a fact about a label, not a recommendation: it suits some cats and not others. Talk to a vet about your cat.
-- **Found a mistake?** Please [open an issue](https://github.com/bamobam/purr-facts/issues) with the food and what the label or source says.
+- **Found a mistake?** Every food page and the About page have a "Report an error" button (see `REPORT_URL` under Deployment).
 - **Built for a cat owner choosing or switching food:** "My cat eats X. What else is there?"
 - **Honest about vague labels.** Labels give guaranteed *minimums* for protein and fat and *maximums* for fibre and moisture, not measured values. Every figure shows its basis ("≥ 9%"), and the real amount is at least the minimum.
 - **Small on purpose.** 33 complete foods from 9 brands sold in Canada, as of 2026-10-07 (the v1 goal is 60 or more). Kitten, prescription and treat products are out of scope.
@@ -81,6 +81,7 @@ data/curated-products.csv   data/prices.csv   data/incidents.csv   data/incident
 | `GET /products/:id/alternatives?goal=protein\|price` | Peers that beat the food on that goal, with the difference; `includeAllStages`, `limit` |
 | `GET /products/aggregate` | Group and aggregate: `groupBy`, `metric` (`count`, `avg:proteinPct`, …), `having`, `sort`, `order` |
 | `GET /incidents` | Incidents, filtered by `productId`, `brand`, `jurisdiction`, `evidenceTier`; newest first |
+| `GET /config` | The report-an-error link, if `REPORT_URL` is set |
 | `GET /meta` | Build date, price coverage, oldest verified dates, recall scope text, sources checked |
 | `GET /health` | 200 with the product count; 503 if the dataset is empty |
 
@@ -115,6 +116,8 @@ Adding a food: add a row to `data/curated-products.csv` with its source URL and 
 ## Deployment
 
 The app ships as one Docker image: the build stage validates the CSVs (a data error fails the build), regenerates the JSON, compiles the server and builds the frontend; the runtime stage runs `node dist/rest/server.js` on `PORT` (default 3000). Use `/health` as the platform's health check. CI builds the image and boots it, then checks that the health endpoint, the frontend, the metadata and the alternatives endpoint respond, because an earlier release crash-looped when the data files were missing from the image and the platform quietly kept serving an older container.
+
+Set `REPORT_URL` (a runtime environment variable, no rebuild needed) to the page where error reports should go, for example a Google Form. `{food}` in the URL is replaced with the food's name and id, so a form field can be prefilled (Google Forms: use the form's "Get pre-filled link" and put `{food}` where the sample answer is). With no `REPORT_URL` the button is hidden. `GET /config` serves it to the frontend.
 
 A monthly workflow (`data-freshness`) runs `npm run validate:data:strict`, which fails on any warning, so stale prices or out-of-date recall searches show up as a red run.
 

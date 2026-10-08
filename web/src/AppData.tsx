@@ -6,6 +6,8 @@ export const MAX_COMPARE = 4;
 interface AppData {
   products: Product[];
   meta?: DatasetMeta;
+  /** The report-an-error link, with `{food}` as a placeholder; absent when none is configured. */
+  reportUrl?: string;
   loading: boolean;
   error?: string;
   selected: string[];
@@ -19,6 +21,7 @@ const Context = createContext<AppData | null>(null);
 export function AppDataProvider({ children }: { children: ReactNode }) {
   const productsState = useApi<Product[]>("/products");
   const metaState = useApi<DatasetMeta>("/meta");
+  const configState = useApi<{ reportUrl?: string }>("/config");
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggleSelected = useCallback((id: string) => {
@@ -30,13 +33,14 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     () => ({
       products: productsState.data ?? [],
       meta: metaState.data,
+      reportUrl: configState.data?.reportUrl,
       loading: productsState.loading,
       error: productsState.error,
       selected,
       toggleSelected,
       clearSelected,
     }),
-    [productsState.data, productsState.loading, productsState.error, metaState.data, selected, toggleSelected, clearSelected]
+    [productsState.data, productsState.loading, productsState.error, metaState.data, configState.data, selected, toggleSelected, clearSelected]
   );
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

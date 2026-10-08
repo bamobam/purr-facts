@@ -1,11 +1,6 @@
 # Archive
 
-`legacy-curated-products.csv` is the original 30-row curated set, exactly as it was before the v1 schema (see `docs/spec-v1.md`).
-
-It is kept because it has data the new files don't yet:
-
-- `price` is **price per ounce** (computed from each source page's package price and size). It has no retailer or date, so it can't become a `prices.csv` row. Use it as a hint when doing the manual price pass.
-- `lifeStage` used marketing terms (`kitten`, `senior`, `all`, `adult`). v1 uses the AAFCO statement from the label instead.
+The original 30-row curated set, from before the v1 schema (see `docs/spec-v1.md`), is no longer kept as a file. It is in git history: `git show 495e54a:data/curated-products.csv`. Its `price` column was price per ounce with no retailer or date, and its `lifeStage` used marketing terms (`kitten`, `senior`, `all`, `adult`); both are superseded by `data/prices.csv` and the label's adequacy statement.
 
 ## What happened to each legacy row
 

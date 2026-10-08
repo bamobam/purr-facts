@@ -10,6 +10,6 @@ export default defineConfig({
   build: { outDir: "dist", emptyOutDir: true },
   server: {
     port: 5173,
-    proxy: { "/products": api, "/incidents": api, "/meta": api, "/health": api },
+    proxy: { "/products": api, "/incidents": api, "/meta": api, "/config": api, "/health": api },
   },
 });

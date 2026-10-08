@@ -16,6 +16,8 @@ import { parseAggregateQuery } from "./parseAggregateQuery";
 export interface AppOptions {
   meta?: DatasetMeta;
   incidents?: Incident[];
+  /** Where the "report an error" button sends people (for example a form). `{food}` is replaced with the food's name by the frontend. */
+  reportUrl?: string;
 }
 
 function newestFirst(list: Incident[]): Incident[] {
@@ -149,6 +151,11 @@ export function createApp(products: Product[], options: AppOptions = {}): Expres
         (jurisdiction === undefined || i.jurisdiction === jurisdiction)
     );
     res.json(newestFirst(results));
+  });
+
+  app.get("/config", (_req: Request, res: Response) => {
+    const url = options.reportUrl?.trim();
+    res.json(url !== undefined && /^https?:\/\/\S+$/.test(url) ? { reportUrl: url } : {});
   });
 
   app.get("/meta", (_req: Request, res: Response) => {

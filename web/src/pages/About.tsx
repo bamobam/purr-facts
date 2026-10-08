@@ -1,4 +1,5 @@
 import { useAppData } from "../AppData";
+import { ReportLink } from "../components/ReportLink";
 
 export function About() {
   const { meta } = useAppData();
@@ -89,12 +90,9 @@ export function About() {
 
       <section aria-labelledby="mistake-heading">
         <h2 id="mistake-heading">Found a mistake?</h2>
+        <p>Tell us which food and what its label or source says, and we will check it.</p>
         <p>
-          Please{" "}
-          <a href="https://github.com/bamobam/purr-facts/issues" target="_blank" rel="noreferrer">
-            open an issue
-          </a>{" "}
-          with the food and what its label or source says.
+          <ReportLink />
         </p>
       </section>
 
