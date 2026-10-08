@@ -10,6 +10,9 @@ describe("fillReportUrl", () => {
   it("leaves the field empty when no food is given, and fills every placeholder", () => {
     expect(fillReportUrl("https://f.example/x?a={food}&b={food}")).to.equal("https://f.example/x?a=&b=");
   });
+  it("also fills the percent-encoded placeholder that Google Forms writes", () => {
+    expect(fillReportUrl("https://f.example/x?entry.1=%7Bfood%7D", "A B")).to.equal("https://f.example/x?entry.1=A%20B");
+  });
   it("leaves a link with no placeholder unchanged", () => {
     expect(fillReportUrl("https://f.example/x")).to.equal("https://f.example/x");
   });
