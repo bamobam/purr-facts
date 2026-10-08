@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AlternativesResponse, useApi } from "../api";
 import { LabelBadges } from "./Badges";
-import { displayName, formatMoney, formatNumber } from "../lib/format";
+import { ALL_STAGES_NOTE, displayName, formatMoney, formatNumber } from "../lib/format";
 
 type Goal = "protein" | "price";
 
@@ -28,6 +28,8 @@ export function Alternatives({ productId, stage, includeAllStages }: { productId
           Lower price per calorie
         </label>
       </fieldset>
+
+      {includeAllStages && <p className="muted small">{ALL_STAGES_NOTE}</p>}
 
       {error && <p role="alert">Couldn't load alternatives: {error}</p>}
       {data && (

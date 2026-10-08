@@ -15,7 +15,7 @@ const KCAL_PER_KG_RANGE = { min: 500, max: 6000 };
 
 /**
  * Allowed deviation, in percent, of the label's kcal/kg from the Atwater estimate. Calibrated on
- * the 33 migrated rows that state kcal/kg (2026-10-06): dry foods landed between -2.1% and +5.9%,
+ * the 32 of 33 live rows that state kcal/kg (2026-10-07): dry foods landed between -2.1% and +5.9%,
  * wet foods between -2.5% and +31.5% (label minimums for protein and fat make the estimate run low,
  * most of all for wet food with extra fat or organ meat, such as Orijen Regional Red at +31.5%).
  * Bands are the observed range plus headroom. These produce warnings, not errors: their job is to

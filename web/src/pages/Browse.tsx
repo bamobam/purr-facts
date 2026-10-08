@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { MAX_COMPARE, useAppData } from "../AppData";
 import { LabelBadges } from "../components/Badges";
-import { displayName, formatMoney, formatNumber, formatNutrient, SortKey, sortProducts } from "../lib/format";
+import { displayName, flagText, formatMoney, formatNumber, formatNutrient, SortKey, sortProducts } from "../lib/format";
 import type { Product } from "../api";
 
 type Basis = "kcal" | "dm" | "asfed";
@@ -20,18 +20,6 @@ function nutrientCell(p: Product, nutrient: "protein" | "fat", basis: Basis): st
     return v === undefined ? "—" : `${formatNumber(v, 0)}%`;
   }
   return nutrient === "protein" ? formatNutrient(p.proteinPct, p.proteinBasis) : formatNutrient(p.fatPct, p.fatBasis);
-}
-
-function flagText(p: Product): string {
-  const n = p.derived?.incidentCount ?? 0;
-  const b = p.derived?.brandIncidentCount ?? 0;
-  if (n > 0) {
-    return `Named in ${n} recall${n === 1 ? "" : "s"}`;
-  }
-  if (b > 0) {
-    return `Brand has ${b} other notice${b === 1 ? "" : "s"}`;
-  }
-  return "None found";
 }
 
 export function Browse() {
@@ -188,7 +176,7 @@ export function Browse() {
                   <td className="num">{nutrientCell(p, "fat", basis)}</td>
                   <td className="num">{formatMoney(p.derived?.pricePerLb)}</td>
                   <td className="num">{formatMoney(p.derived?.pricePer1000kcal)}</td>
-                  <td>{flagText(p)}</td>
+                  <td>{flagText(p.derived)}</td>
                 </tr>
               );
             })}

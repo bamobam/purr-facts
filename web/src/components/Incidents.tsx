@@ -33,33 +33,44 @@ export function IncidentsSection({ detail }: { detail: ProductDetail }) {
   const { product, incidents, brandIncidents, incidentStatus } = detail;
   const checkedOn = incidentStatus.checkedOn ?? "an unknown date";
   const brandChecks = (meta?.incidentChecks ?? []).filter((c) => c.tier === "regulator" || c.brand?.toLowerCase() === product.brand.toLowerCase());
+  // Investigations are shown apart from recalls and never mixed into one list.
+  const recalls = incidents.filter((i) => i.evidenceTier !== "report");
+  const reports = incidents.filter((i) => i.evidenceTier === "report");
+  const brandRecalls = brandIncidents.filter((i) => i.evidenceTier !== "report");
+  const brandReports = brandIncidents.filter((i) => i.evidenceTier === "report");
 
   return (
     <section aria-labelledby="incidents-heading">
       <h2 id="incidents-heading">Recalls and safety alerts</h2>
-      {incidents.length > 0 ? (
+      {recalls.length > 0 ? (
         <>
           <p>These notices name this food:</p>
-          <ul className="incident-list">
-            {incidents.map((i) => (
-              <IncidentItem key={i.id} incident={i} />
-            ))}
-          </ul>
+          <IncidentList items={recalls} />
         </>
       ) : (
         <p>
           No recall or safety alert names this food in the sources we checked, as of {checkedOn}. This is not a safety rating: some recalls never appear in these sources.
         </p>
       )}
-      {brandIncidents.length > 0 && (
+      {reports.length > 0 && (
+        <>
+          <h3>Regulator investigations that name this food (not recalls)</h3>
+          <p className="muted">{incidentStatus.tiers.report}</p>
+          <IncidentList items={reports} />
+        </>
+      )}
+      {brandRecalls.length > 0 && (
         <>
           <h3>Other notices involving {product.brand}</h3>
           <p className="muted">These do not name this food. They are shown because the brand also appears in them.</p>
-          <ul className="incident-list">
-            {brandIncidents.map((i) => (
-              <IncidentItem key={i.id} incident={i} />
-            ))}
-          </ul>
+          <IncidentList items={brandRecalls} />
+        </>
+      )}
+      {brandReports.length > 0 && (
+        <>
+          <h3>Regulator investigations that name {product.brand} (not recalls)</h3>
+          <p className="muted">{incidentStatus.tiers.report}</p>
+          <IncidentList items={brandReports} />
         </>
       )}
       <details>
@@ -90,5 +101,15 @@ export function IncidentsSection({ detail }: { detail: ProductDetail }) {
         )}
       </details>
     </section>
+  );
+}
+
+function IncidentList({ items }: { items: Incident[] }) {
+  return (
+    <ul className="incident-list">
+      {items.map((i) => (
+        <IncidentItem key={i.id} incident={i} />
+      ))}
+    </ul>
   );
 }

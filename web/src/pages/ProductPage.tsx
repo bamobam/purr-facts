@@ -6,7 +6,7 @@ import { Alternatives } from "../components/Alternatives";
 import { LabelBadges } from "../components/Badges";
 import { ReportLink } from "../components/ReportLink";
 import { IncidentsSection } from "../components/Incidents";
-import { cohortLabel, describeBenchmark, displayName, formatMoney, formatNumber, formatNutrient } from "../lib/format";
+import { ALL_STAGES_NOTE, cohortLabel, describeBenchmark, displayName, formatMoney, formatNumber, formatNutrient } from "../lib/format";
 
 const BENCHMARK_LABEL: Record<BenchmarkMetric, string> = {
   proteinGPer1000kcal: "Protein per 1000 kcal",
@@ -156,6 +156,7 @@ export function ProductPage() {
             Also compare with foods labelled for all life stages
           </label>
         </p>
+        {p.adequacyStage !== "not-stated" && <p className="muted small">{ALL_STAGES_NOTE}</p>}
         {p.adequacyStage === "not-stated" && <p className="muted">This label doesn't state a life stage, so it can only be compared with other foods that don't either.</p>}
         <ul className="plain">
           {(Object.keys(BENCHMARK_LABEL) as BenchmarkMetric[]).map((metric) => (

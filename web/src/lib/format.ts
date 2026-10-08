@@ -1,5 +1,6 @@
 import type { BenchmarkResult } from "../../../src/metrics/benchmarks";
 import { MIN_COHORT_SIZE } from "../../../src/metrics/benchmarks";
+import type { DerivedMetrics } from "../../../src/models/DerivedMetrics";
 import type { Basis, AdequacyStage, Product } from "../../../src/models/Product";
 
 const DASH = "—";
@@ -114,4 +115,33 @@ export function displayName(product: Pick<Product, "brand" | "productName">): st
     }
   }
   return `${product.brand} ${product.productName}`;
+}
+
+/** Shown beside the all-life-stages toggle: why those foods are compared separately by default. */
+export const ALL_STAGES_NOTE =
+  "Foods labelled for all life stages are typically more calorie-dense, which is why they are compared separately unless you include them.";
+
+/**
+ * The "recall flags" cell. A regulator investigation is never worded as a recall, and a notice that
+ * only involves the brand is shown only when nothing names the food itself.
+ */
+export function flagText(d: DerivedMetrics | undefined): string {
+  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  const recalls = d?.incidentCount ?? 0;
+  const reports = d?.reportCount ?? 0;
+  const brandNotices = d?.brandIncidentCount ?? 0;
+  const brandReports = d?.brandReportCount ?? 0;
+  if (recalls > 0) {
+    return `Named in ${plural(recalls, "recall", "recalls")}`;
+  }
+  if (reports > 0) {
+    return `Named in ${plural(reports, "investigation", "investigations")}, not ${reports === 1 ? "a recall" : "recalls"}`;
+  }
+  if (brandNotices > 0) {
+    return `Brand has ${plural(brandNotices, "other notice", "other notices")}`;
+  }
+  if (brandReports > 0) {
+    return `Brand named in ${plural(brandReports, "investigation", "investigations")}, not ${brandReports === 1 ? "a recall" : "recalls"}`;
+  }
+  return "None found";
 }
