@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import request from "supertest";
 import { createApp } from "../../src/rest/app";
-import { fixtureProducts } from "../../src/data/fixtureProducts";
+import { fixtureProducts } from "../fixtures/products";
 
 describe("GET /products/aggregate", () => {
   const app = createApp(fixtureProducts);
@@ -25,6 +25,31 @@ describe("GET /products/aggregate", () => {
     }
   });
 
+  it("groups by parentCompany", async () => {
+    // Every fixture product shares the default parentCompany "Purina".
+    const res = await request(app).get("/products/aggregate").query({ groupBy: "parentCompany", metric: "count" });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.deep.equal([{ parentCompany: "Purina", metric: 5, count: 5 }]);
+  });
+
+  it("groups by adequacyStage", async () => {
+    const res = await request(app)
+      .get("/products/aggregate")
+      .query({ groupBy: "adequacyStage", metric: "count", sort: "metric", order: "asc" });
+    expect(res.status).to.equal(200);
+    expect(res.body.map((r: any) => [r.adequacyStage, r.metric])).to.deep.equal([
+      ["all-life-stages", 2],
+      ["adult-maintenance", 3],
+    ]);
+  });
+
+  it("groups by adequacyStandard", async () => {
+    // Every fixture product cites AAFCO.
+    const res = await request(app).get("/products/aggregate").query({ groupBy: "adequacyStandard", metric: "count" });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.deep.equal([{ adequacyStandard: "aafco", metric: 5, count: 5 }]);
+  });
+
   it("supports the count function without a field", async () => {
     const res = await request(app).get("/products/aggregate").query({ groupBy: "brand", metric: "count" });
     expect(res.status).to.equal(200);
@@ -32,10 +57,10 @@ describe("GET /products/aggregate", () => {
   });
 
   it("applies having=below-average to filter groups", async () => {
-    const all = await request(app).get("/products/aggregate").query({ groupBy: "brand", metric: "avg:price" });
+    const all = await request(app).get("/products/aggregate").query({ groupBy: "brand", metric: "avg:kcalPerKg" });
     const filtered = await request(app)
       .get("/products/aggregate")
-      .query({ groupBy: "brand", metric: "avg:price", having: "below-average" });
+      .query({ groupBy: "brand", metric: "avg:kcalPerKg", having: "below-average" });
     expect(filtered.status).to.equal(200);
     expect(filtered.body.length).to.be.lessThan(all.body.length);
   });
@@ -103,12 +128,12 @@ describe("GET /products/aggregate", () => {
   });
 
   it("breaks a tie in sort order alphabetically by group key", async () => {
-    // Fixture data: lifeStage "kitten" and "senior" both have exactly 1 product, "adult" has 3.
+    // Fixture data: "Meow Mix" has 1 product; "Blue Buffalo" and "Purina" tie with 2 each.
     const res = await request(app)
       .get("/products/aggregate")
-      .query({ groupBy: "lifeStage", metric: "count", sort: "metric", order: "asc" });
+      .query({ groupBy: "brand", metric: "count", sort: "metric", order: "asc" });
     expect(res.status).to.equal(200);
-    expect(res.body.map((r: any) => r.lifeStage)).to.deep.equal(["kitten", "senior", "adult"]);
+    expect(res.body.map((r: any) => r.brand)).to.deep.equal(["Meow Mix", "Blue Buffalo", "Purina"]);
   });
 
   it("omits groups where the metric field has no defined values across the whole fixture set", async () => {

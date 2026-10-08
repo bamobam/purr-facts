@@ -9,8 +9,8 @@ import {
 } from "../queryEngine/aggregateProducts";
 import { parseEnumParam, parseStringParam } from "./queryParamParsing";
 
-const GROUPABLE_FIELDS: GroupableField[] = ["brand", "variant", "foodType", "lifeStage"];
-const NUMERIC_FIELDS: NumericField[] = ["proteinPct", "fatPct", "fiberPct", "moisturePct", "calorieDensity", "price"];
+const GROUPABLE_FIELDS: GroupableField[] = ["brand", "parentCompany", "variant", "foodType", "adequacyStandard", "adequacyStage"];
+const NUMERIC_FIELDS: NumericField[] = ["proteinPct", "fatPct", "fiberPct", "moisturePct", "kcalPerKg"];
 const AGGREGATE_FUNCTIONS: AggregateFunction[] = ["avg", "min", "max", "sum", "count"];
 const HAVING_FILTERS: HavingFilter[] = ["above-average", "below-average"];
 const SORT_TARGETS: SortTarget[] = ["group", "metric"];

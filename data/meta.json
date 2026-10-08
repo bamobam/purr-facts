@@ -1,0 +1,126 @@
+{
+  "builtAt": "2026-10-08",
+  "productCount": 33,
+  "productsWithPrice": 33,
+  "priceCoverage": 1,
+  "priceObservationCount": 33,
+  "incidentCount": 4,
+  "productsWithIncidents": 1,
+  "reportCount": 0,
+  "incidentChecks": [
+    {
+      "tier": "regulator",
+      "jurisdiction": "US",
+      "source": "FDA animal and veterinary recalls and withdrawals list (63 notices, spreadsheet export covering 2019-01-31 to 2026-09-08; searched by brand name and by company name)",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2019-01-31",
+      "url": "https://www.fda.gov/animal-veterinary/safety-health/recalls-withdrawals"
+    },
+    {
+      "tier": "regulator",
+      "jurisdiction": "US",
+      "source": "FDA site search for each catalog brand for 2016-10 to 2018 (the yearly archive pages were not read, so this period is covered only by search)",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+    },
+    {
+      "tier": "regulator",
+      "jurisdiction": "CA",
+      "source": "Health Canada and CFIA recalls and safety alerts open data (34,177 notices from 1991, all categories; searched by brand and company name, and every notice with a pet-related title read)",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://recalls-rappels.canada.ca/sites/default/files/opendata-donneesouvertes/HCRSAMOpenData.json"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "Purina News Center statements page, Purina FAQs, Petful brand history, and Pet Food Industry and Pet Food Processing search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://newscenter.purina.com/statements",
+      "brand": "Fancy Feast"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "Meow Mix recall page, Smucker announcements, Petful brand history, and trade press search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://www.meowmix.com/no-recall",
+      "brand": "Meow Mix"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "Blue Buffalo recalls page (as of 2026-10-07), Petful brand history, and trade press search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://www.bluebuffalo.com/why-choose-blue/quality-and-safety/are-there-any-blue-buffalo-recalls/",
+      "brand": "Blue Buffalo"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "Hill's press releases page (lists 2022 onward), Food Safety News, Petful brand history and trade press search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://www.hillspet.com/about-us/press-releases",
+      "brand": "Hill's Science Diet"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "CA",
+      "source": "Royal Canin Canada quality and food safety page (no recall list), Petful and Truth About Pet Food brand histories, AVMA notices",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://www.royalcanin.com/ca/about-us/quality-and-food-safety",
+      "brand": "Royal Canin"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "IAMS FAQ (no recall information), Petful brand history (last entry 2013) and trade press search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://www.iams.com/faq",
+      "brand": "IAMS"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "Fromm safety alerts and announcements, Petful brand history and trade press search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://frommfamily.com/learn/safety-alerts/recall-notice-2026-08-21-turkey-pate-and-milos-meatloaf",
+      "brand": "Fromm"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "CA",
+      "source": "Orijen and Champion Petfoods FAQ and resources (no recall list), Petful brand history (only a 2008 Australia-only recall) and trade press search",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://orijen.ca/us/faq",
+      "brand": "Orijen"
+    },
+    {
+      "tier": "company-or-trade",
+      "jurisdiction": "US",
+      "source": "Tiki Pets FAQ (no recall information) and trade press search; no recall history page was found",
+      "checkedOn": "2026-10-07",
+      "coversFrom": "2016-10-07",
+      "url": "https://tikipets.com/faqs/",
+      "brand": "Tiki Cat"
+    }
+  ],
+  "incidentScope": "Incidents are recalls, market withdrawals and safety alerts from the last 10 years, drawn from three kinds of source, each labelled. Regulator notices come from the CFIA or Health Canada, or from the FDA. Company or trade entries come from a manufacturer's own announcement or from the trade and veterinary press, and name a dated recall. Reports are regulator investigations that name a brand; they are not confirmed recalls and are not counted as incidents. A US notice does not by itself mean a Canadian lot is affected, so check the notice for lot numbers. Recalls that cover only dog food are not included, because dogs and cats have different nutrient needs. Consumer complaints, social media posts and lawsuits are not included. Pet food recall reporting in Canada is largely voluntary, so a food with no entry here has not necessarily never been recalled.",
+  "incidentTiers": {
+    "regulator": "Published by the CFIA, Health Canada or the FDA.",
+    "company-or-trade": "From the manufacturer's own announcement or the trade and veterinary press. A dated recall that names the product or line.",
+    "report": "A regulator investigation or adverse-event summary that names the brand. Not a confirmed recall, and no cause has been established."
+  },
+  "oldestLastVerified": "2026-10-05",
+  "oldestPriceAsOf": "2026-10-06",
+  "incidentsCheckedOn": "2026-10-07"
+}

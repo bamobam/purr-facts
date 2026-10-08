@@ -1,17 +1,16 @@
-import { FoodType, LifeStage, Product } from "../models/Product";
+import { AdequacyStage, AdequacyStandard, FoodType, Product } from "../models/Product";
 import { normalizeBrand } from "../shared/normalizeBrand";
 
 export interface ProductFilters {
   brand?: string;
   variant?: string;
   foodType?: FoodType;
-  lifeStage?: LifeStage;
+  adequacyStandard?: AdequacyStandard;
+  adequacyStage?: AdequacyStage;
   proteinPctMin?: number;
   proteinPctMax?: number;
   fatPctMin?: number;
   fatPctMax?: number;
-  priceMin?: number;
-  priceMax?: number;
 }
 
 function matchesRange(value: number | undefined, min: number | undefined, max: number | undefined): boolean {
@@ -41,16 +40,16 @@ export function filterProducts(products: Product[], filters: ProductFilters): Pr
     if (filters.foodType !== undefined && product.foodType !== filters.foodType) {
       return false;
     }
-    if (filters.lifeStage !== undefined && product.lifeStage !== filters.lifeStage) {
+    if (filters.adequacyStandard !== undefined && product.adequacyStandard !== filters.adequacyStandard) {
+      return false;
+    }
+    if (filters.adequacyStage !== undefined && product.adequacyStage !== filters.adequacyStage) {
       return false;
     }
     if (!matchesRange(product.proteinPct, filters.proteinPctMin, filters.proteinPctMax)) {
       return false;
     }
     if (!matchesRange(product.fatPct, filters.fatPctMin, filters.fatPctMax)) {
-      return false;
-    }
-    if (!matchesRange(product.price, filters.priceMin, filters.priceMax)) {
       return false;
     }
     return true;

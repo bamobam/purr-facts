@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import request from "supertest";
 import { createApp } from "../../src/rest/app";
-import { fixtureProducts } from "../../src/data/fixtureProducts";
+import { fixtureProducts } from "../fixtures/products";
 
 describe("GET /products", () => {
   const app = createApp(fixtureProducts);
@@ -45,12 +45,19 @@ describe("GET /products", () => {
     }
   });
 
-  it("filters by lifeStage", async () => {
-    const res = await request(app).get("/products").query({ lifeStage: "kitten" });
+  it("filters by adequacyStage", async () => {
+    const res = await request(app).get("/products").query({ adequacyStage: "all-life-stages" });
     expect(res.status).to.equal(200);
+    expect(res.body.length).to.be.greaterThan(0);
     for (const product of res.body) {
-      expect(product.lifeStage).to.equal("kitten");
+      expect(product.adequacyStage).to.equal("all-life-stages");
     }
+  });
+
+  it("filters by adequacyStandard", async () => {
+    const res = await request(app).get("/products").query({ adequacyStandard: "fediaf" });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.deep.equal([]);
   });
 
   it("filters by a proteinPct range", async () => {
@@ -78,10 +85,30 @@ describe("GET /products", () => {
     expect(res.body.error).to.include("foodType");
   });
 
-  it("returns 400 with a descriptive error for an invalid lifeStage value", async () => {
-    const res = await request(app).get("/products").query({ lifeStage: "puppy" });
+  it("accepts adequacyStage=not-stated and returns only products with that value", async () => {
+    const res = await request(app).get("/products").query({ adequacyStage: "not-stated" });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.deep.equal([]);
+  });
+
+  it("returns 400 with a descriptive error for an invalid adequacyStage value", async () => {
+    const res = await request(app).get("/products").query({ adequacyStage: "puppy" });
     expect(res.status).to.equal(400);
-    expect(res.body.error).to.include("lifeStage");
+    expect(res.body.error).to.include("adequacyStage");
+  });
+
+  it("returns 400 with a descriptive error for an invalid adequacyStandard value", async () => {
+    const res = await request(app).get("/products").query({ adequacyStandard: "nrc" });
+    expect(res.status).to.equal(400);
+    expect(res.body.error).to.include("adequacyStandard");
+  });
+
+  it("no longer accepts the removed lifeStage, aafcoStatement and price filters", async () => {
+    for (const param of ["lifeStage", "aafcoStatement", "priceMin", "priceMax"]) {
+      const res = await request(app).get("/products").query({ [param]: "1" });
+      expect(res.status, param).to.equal(400);
+      expect(res.body.error, param).to.include(param);
+    }
   });
 
   it("returns 400 with a descriptive error for a non-numeric range value", async () => {
@@ -103,19 +130,19 @@ describe("GET /products", () => {
   });
 
   it("returns 400 for an empty numeric range value rather than treating it as zero", async () => {
-    const res = await request(app).get("/products?priceMin=");
+    const res = await request(app).get("/products?proteinPctMin=");
     expect(res.status).to.equal(400);
-    expect(res.body.error).to.include("priceMin");
+    expect(res.body.error).to.include("proteinPctMin");
   });
 
   it("combines three or more filters together with AND semantics", async () => {
-    const res = await request(app).get("/products").query({ brand: "Blue Buffalo", foodType: "dry", lifeStage: "kitten" });
+    const res = await request(app).get("/products").query({ brand: "Blue Buffalo", foodType: "dry", adequacyStage: "all-life-stages" });
     expect(res.status).to.equal(200);
     expect(res.body.length).to.be.greaterThan(0);
     for (const product of res.body) {
       expect(product.brand).to.equal("Blue Buffalo");
       expect(product.foodType).to.equal("dry");
-      expect(product.lifeStage).to.equal("kitten");
+      expect(product.adequacyStage).to.equal("all-life-stages");
     }
   });
 });

@@ -1,27 +1,15 @@
 import { expect } from "chai";
 import { filterProducts } from "../../src/queryEngine/filterProducts";
 import { Product } from "../../src/models/Product";
-
-function makeProduct(overrides: Partial<Product>): Product {
-  return {
-    id: "p1",
-    brand: "Purina",
-    productName: "Fancy Feast Chicken",
-    variant: "Chicken",
-    foodType: "wet",
-    lifeStage: "adult",
-    dataSource: "curated",
-    ...overrides,
-  };
-}
+import { makeProduct } from "../fixtures/products";
 
 describe("filterProducts", () => {
   const products: Product[] = [
-    makeProduct({ id: "p1", brand: "Purina", variant: "Chicken", foodType: "wet", lifeStage: "adult", proteinPct: 11, fatPct: 3, price: 0.58 }),
-    makeProduct({ id: "p2", brand: "Purina", variant: "Salmon", foodType: "wet", lifeStage: "adult", proteinPct: 10, fatPct: 3, price: 0.58 }),
-    makeProduct({ id: "p3", brand: "Meow Mix", variant: "Original", foodType: "dry", lifeStage: "adult", proteinPct: 32, fatPct: 12, price: 0.12 }),
-    makeProduct({ id: "p4", brand: "Blue Buffalo", variant: "Chicken", foodType: "dry", lifeStage: "kitten", proteinPct: 40, fatPct: 18, price: 0.35 }),
-    makeProduct({ id: "p5", brand: "Blue Buffalo", variant: "Turkey", foodType: "wet", lifeStage: "senior" }),
+    makeProduct({ id: "p1", brand: "Purina", variant: "Chicken", foodType: "wet", adequacyStage: "adult-maintenance", proteinPct: 11, fatPct: 3 }),
+    makeProduct({ id: "p2", brand: "Purina", variant: "Salmon", foodType: "wet", adequacyStage: "adult-maintenance", proteinPct: 10, fatPct: 3 }),
+    makeProduct({ id: "p3", brand: "Meow Mix", variant: "Original", foodType: "dry", adequacyStage: "adult-maintenance", adequacyStandard: "fediaf", proteinPct: 32, fatPct: 12 }),
+    makeProduct({ id: "p4", brand: "Blue Buffalo", variant: "Chicken", foodType: "dry", adequacyStage: "all-life-stages", proteinPct: 40, fatPct: 18 }),
+    makeProduct({ id: "p5", brand: "Blue Buffalo", variant: "Turkey", foodType: "wet", adequacyStage: "all-life-stages" }),
   ];
 
   it("returns only products matching the given brand", () => {
@@ -59,9 +47,14 @@ describe("filterProducts", () => {
     expect(result.map((p) => p.id)).to.deep.equal(["p3", "p4"]);
   });
 
-  it("filters by lifeStage", () => {
-    const result = filterProducts(products, { lifeStage: "kitten" });
-    expect(result.map((p) => p.id)).to.deep.equal(["p4"]);
+  it("filters by adequacyStage", () => {
+    const result = filterProducts(products, { adequacyStage: "all-life-stages" });
+    expect(result.map((p) => p.id)).to.deep.equal(["p4", "p5"]);
+  });
+
+  it("filters by adequacyStandard", () => {
+    expect(filterProducts(products, { adequacyStandard: "fediaf" }).map((p) => p.id)).to.deep.equal(["p3"]);
+    expect(filterProducts(products, { adequacyStandard: "aafco" }).map((p) => p.id)).to.deep.equal(["p1", "p2", "p4", "p5"]);
   });
 
   it("filters by a proteinPct range", () => {
@@ -72,11 +65,6 @@ describe("filterProducts", () => {
   it("filters by a fatPct range", () => {
     const result = filterProducts(products, { fatPctMin: 10 });
     expect(result.map((p) => p.id)).to.deep.equal(["p3", "p4"]);
-  });
-
-  it("filters by a price range", () => {
-    const result = filterProducts(products, { priceMax: 0.2 });
-    expect(result.map((p) => p.id)).to.deep.equal(["p3"]);
   });
 
   it("excludes products missing the field a numeric range filter targets", () => {
@@ -90,7 +78,7 @@ describe("filterProducts", () => {
   });
 
   it("combines three or more filters together with AND semantics", () => {
-    const result = filterProducts(products, { brand: "Blue Buffalo", foodType: "dry", lifeStage: "kitten", proteinPctMin: 20 });
+    const result = filterProducts(products, { brand: "Blue Buffalo", foodType: "dry", adequacyStage: "all-life-stages", proteinPctMin: 20 });
     expect(result.map((p) => p.id)).to.deep.equal(["p4"]);
   });
 });

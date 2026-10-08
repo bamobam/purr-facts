@@ -1,18 +1,10 @@
 import { expect } from "chai";
 import { aggregateProducts, GroupableField } from "../../src/queryEngine/aggregateProducts";
 import { Product } from "../../src/models/Product";
+import { makeProduct as makeBaseProduct } from "../fixtures/products";
 
 function makeProduct(overrides: Partial<Product>): Product {
-  return {
-    id: "p",
-    brand: "A",
-    productName: "Product",
-    variant: "Original",
-    foodType: "dry",
-    lifeStage: "adult",
-    dataSource: "curated",
-    ...overrides,
-  };
+  return makeBaseProduct({ id: "p", brand: "A", productName: "Product", variant: "Original", foodType: "dry", ...overrides });
 }
 
 describe("aggregateProducts", () => {

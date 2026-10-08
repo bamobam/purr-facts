@@ -1,9 +1,9 @@
 import { createApp } from "./app";
-import { loadDataset } from "../data/loadDataset";
+import { loadDataset, loadIncidents, loadMeta } from "../data/loadDataset";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-const app = createApp(loadDataset());
+const app = createApp(loadDataset(), { meta: loadMeta(), incidents: loadIncidents(), reportUrl: process.env.REPORT_URL });
 
 app.listen(PORT, () => {
   console.log(`Purr Facts listening on port ${PORT}`);
